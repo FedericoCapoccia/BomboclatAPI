@@ -1,6 +1,7 @@
 package com.example.bomboclatserver.persona;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -40,16 +41,12 @@ public class PersonaController {
     }
     
     @PostMapping
-    public ResponseEntity<?> addPersona(@Valid @RequestBody PersonaAddRequest request, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest()
-                    .body(bindingResult.getAllErrors().getFirst().getDefaultMessage());
-        }
+    public ResponseEntity<?> addPersona(@Valid @RequestBody PersonaAddRequest request) {
         UUID uuid = UUID.randomUUID();
         Persona persona = new Persona(uuid, request.nome(), request.cognome(), request.dataNascita());
         System.out.println("ADD: ["+persona+"]");
         personaDao.addPersona(persona);
-        return ResponseEntity.created(URI.create("/api/persone/"+uuid)).build();
+        return ResponseEntity.created(URI.create("/api/persone/"+uuid)).body("{}");
     }
     
     @DeleteMapping("{uuid}")
@@ -69,11 +66,7 @@ public class PersonaController {
     }
 
     @PutMapping("{uuid}")
-    public ResponseEntity<?> updatePersona(@PathVariable String uuid, @RequestBody PersonaUpdateRequest request, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest()
-                    .body(bindingResult.getAllErrors().getFirst().getDefaultMessage());
-        }
+    public ResponseEntity<?> updatePersona(@PathVariable String uuid, @Valid @RequestBody PersonaUpdateRequest request) {
         UUID id;
         try {
             id = UUID.fromString(uuid);
