@@ -1,10 +1,10 @@
 package com.example.bomboclatserver.persona;
 
-import com.example.bomboclatserver.exceptions.ResourceNotFoundException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -17,11 +17,10 @@ public class PersonaDaoImpl implements PersonaDao {
     }
 
     @Override
-    public Persona getPersona(UUID uuid) {
+    public Optional<Persona>  getPersona(UUID uuid) {
         return jdbcClient.sql("SELECT * FROM persona WHERE uuid = ? LIMIT 1")
                 .param(uuid)
-                .query(Persona.class).optional()
-                .orElseThrow(() -> new ResourceNotFoundException("Persona con id: [" + uuid + "] non trovata"   ));
+                .query(Persona.class).optional();
     }
 
     @Override

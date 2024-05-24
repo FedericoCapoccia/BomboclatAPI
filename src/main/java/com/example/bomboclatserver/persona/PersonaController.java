@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController @RequestMapping("/api/persone")
@@ -26,8 +27,10 @@ public class PersonaController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("UUID non valido");
         }
-        Persona persona = personaDao.getPersona(id);
-        return ResponseEntity.ok(persona);
+        Optional<Persona> persona = personaDao.getPersona(id);
+        return persona.isPresent() ?
+                ResponseEntity.ok(persona) :
+                ResponseEntity.notFound().build();
     }
     
     @GetMapping
