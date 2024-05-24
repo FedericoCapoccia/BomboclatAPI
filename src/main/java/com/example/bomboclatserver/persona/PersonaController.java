@@ -69,7 +69,11 @@ public class PersonaController {
     }
 
     @PutMapping("{uuid}")
-    public ResponseEntity<?> updatePersona(@PathVariable String uuid, @RequestBody PersonaUpdateRequest request) {
+    public ResponseEntity<?> updatePersona(@PathVariable String uuid, @RequestBody PersonaUpdateRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest()
+                    .body(bindingResult.getAllErrors().getFirst().getDefaultMessage());
+        }
         UUID id;
         try {
             id = UUID.fromString(uuid);
