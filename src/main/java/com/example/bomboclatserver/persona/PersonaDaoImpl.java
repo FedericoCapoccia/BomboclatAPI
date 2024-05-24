@@ -41,7 +41,12 @@ public class PersonaDaoImpl implements PersonaDao {
 
     @Override
     public void updatePersona(Persona persona) {
-
+        jdbcClient.sql("UPDATE persona SET nome = ?, cognome = ?, data_nascita = ? WHERE uuid = ?")
+                .param(persona.getNome())
+                .param(persona.getCognome())
+                .param(persona.getDataNascita())
+                .param(persona.getUuid())
+                .update();
     }
 
     @Override

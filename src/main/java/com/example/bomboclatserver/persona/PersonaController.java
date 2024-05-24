@@ -9,8 +9,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@RestController
-@RequestMapping("/api/persone")
+@RestController @RequestMapping("/api/persone")
 public class PersonaController {
     
     private final PersonaDao personaDao;
@@ -20,8 +19,14 @@ public class PersonaController {
     }
     
     @GetMapping("{uuid}")
-    public ResponseEntity<Persona> getPersona(@PathVariable UUID uuid) {
-        Persona persona = personaDao.getPersona(uuid);
+    public ResponseEntity<?> getPersona(@PathVariable String uuid) {
+        UUID id;
+        try {
+            id = UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("UUID non valido");
+        }
+        Persona persona = personaDao.getPersona(id);
         return ResponseEntity.ok(persona);
     }
     
@@ -45,11 +50,32 @@ public class PersonaController {
     }
     
     @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deletePersona(@PathVariable UUID uuid) {
-        if (!personaDao.existsPersona(uuid)) {
+    public ResponseEntity<?> deletePersona(@PathVariable String uuid) {
+        UUID id;
+        try {
+            id = UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("UUID non valido");
+        }
+        
+        if (!personaDao.existsPersona(id)) {
             return ResponseEntity.notFound().build();
         }
-        personaDao.deletePersona(uuid);
+        personaDao.deletePersona(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("{uuid}")
+    public ResponseEntity<?> updatePersona(@PathVariable String uuid, @RequestBody PersonaUpdateRequest request) {
+        UUID id;
+        try {
+            id = UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("UUID non valido");
+        }
+        
+        Persona persona = new Persona(id, request.nome(), request.cognome(), request.dataNascita());
+        personaDao.updatePersona(persona);
         return ResponseEntity.noContent().build();
     }
 }
